@@ -82,7 +82,7 @@ setup(
     py_modules=['ccbake'],
     entry_points={
         'console_scripts': [
-            'cc-bake=latuni.__main__:main',
+            'cc-bake=ccbake.__main__:main',
             ],
     },
     install_requires=[
