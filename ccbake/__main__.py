@@ -4,12 +4,15 @@
 import os
 import sys
 import argparse
+import stat
+from pathlib import Path
 
+import requests
 import ccbake
 
 
 def main():
-    default_server = "localhost:5000"
+    default_server = "localhost:3000"
 
     parser = argparse.ArgumentParser(
         prog="cc-bake",
@@ -60,14 +63,50 @@ def main():
         parser.error("Conflicting options specified: " +
                      "--recipe and --recipe-file")
     elif args.recipe:
-        recipe = args.recipe
+        recipe = ccbake.Recipe(args.recipe)
     elif args.recipe_file:
-        recipe = args.recipe_file.read()
+        recipe = ccbake.Recipe(args.recipe_file.read())
     else:
         parser.error("Recipe option required: please specify " +
                      "--recipe or --recipe-file")
 
-    print("infiles={0}".format(args.infile))
+    out_fh = None
+    out_dir = False
+    if args.output == '-':
+        out_fh = sys.stdout.buffer
+    else:
+        try:
+            s = os.stat(args.output)
+            if stat.S_ISDIR(s.st_mode):
+                out_dir = Path(args.output)
+        except FileNotFoundError:
+            pass
+        if not out_dir:
+            out_fh = open(args.output, "wb")
+
+    try:
+        for in_fh in args.infile:
+            data = in_fh.read()
+            result = ccbake.bake(args.server, recipe, data)
+            if out_dir:
+                in_name = Path(in_fh.name)
+                out_name = out_dir.joinpath(in_name.name)
+                out_fh = open(out_name, "wb")
+            out_fh.write(result)
+            if out_dir:
+                out_fh.close()
+            in_fh.close()
+    except (
+            requests.exceptions.ConnectionError,
+            ccbake.BakeException,
+    ) as e:
+        sys.stderr.write("Bake error: {}\n".format(e))
+        sys.exit(1)
+    except (
+        OSError,
+    ) as e:
+        sys.stderr.write("File I/O error: {}\n".format(e))
+        sys.exit(1)
 
 
 if __name__ == '__main__':
