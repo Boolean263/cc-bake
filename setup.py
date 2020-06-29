@@ -86,7 +86,7 @@ setup(
             ],
     },
     install_requires=[
-        # 'requests', 'maya', 'records',
+        'requests',
         ],
     include_package_data=True,
     license='MIT',
