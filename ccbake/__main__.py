@@ -4,7 +4,6 @@
 import os
 import sys
 import argparse
-import stat
 from pathlib import Path
 
 import requests
@@ -73,15 +72,22 @@ def main():
     out_fh = None
     out_dir = False
     if args.output == '-':
+        # Write everything as binary to stdout
         out_fh = sys.stdout.buffer
     else:
-        try:
-            s = os.stat(args.output)
-            if stat.S_ISDIR(s.st_mode):
-                out_dir = Path(args.output)
-        except FileNotFoundError:
-            pass
+        # Determine if output exists, and is a file or directory
+        od = Path(args.output)
+        if not od.exists() and args.output[-1] == os.sep:
+            # Doesn't exist, but name ends with a '/',
+            # which implies the user wanted a directory
+            od.mkdir()
+        if od.is_dir():
+            # Exists and is a directory.
+            out_dir = od
+
         if not out_dir:
+            # If we don't have an output directory,
+            # write all output to the given file name
             out_fh = open(args.output, "wb")
 
     try:
