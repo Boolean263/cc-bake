@@ -39,6 +39,7 @@ You can see the help for `cc-bake` by running it with `-h`/`--help`. The main op
 * `-r`/`--recipe`: specify the recipe as a string on the command line.
 * `-f`/`--recipe-file`: specify the name of a file containing a recipe.
 * `-o`/`--output`: file or directory to which to write the output. By default, writes to stdout.
+* `-s`/`--server`: as described above.
 * Any other options are taken to be the names of files with input data. By default, reads from stdin.
 
 You are required to specify a recipe using `-r` or `-f`. All other options are, well, optional.
