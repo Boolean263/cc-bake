@@ -85,7 +85,10 @@ class Recipe(list):
     def __init__(self, recipe):
         try:
             # Start assuming a JSON string
-            list.__init__(self, json.loads(recipe))
+            item = json.loads(recipe)
+            if type(item) != list:
+                item = [item]
+            list.__init__(self, item)
         except json.JSONDecodeError as e:
             # Not JSON. Maybe Chef-format? For now we can't handle that
             raise e
