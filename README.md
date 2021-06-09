@@ -29,7 +29,7 @@ If I've done everything right, you should be able to install the script with the
 
 Simple example:
 
-    echo "... ---:.-.. --- -. --. --..--:.- -. -..:- .... .- -. -.- ...:..-. --- .-.:.- .-.. .-..:- .... .:..-. .. ... ...." \
+    echo "... ---:.-.. --- -. --. --..--:.- -. -..:- .... .- -. -.- ...:..-. --- .-.:.- .-.. .-..:- .... .:..-. .. ... .... " \
     | cc-bake -r '[{"op":"from morse code", "args": {"wordDelimiter": "Colon"}}]'
 
 By default, `cc-bake` tries to connect to `localhost:3000`, since that's where CyberChef-server listens by default. You can tell `cc-bake` to go elsewhere with the `-s`/`--server` command-line option, or by setting the `CYBERCHEF_SERVER` environment variable.
@@ -45,6 +45,28 @@ You can see the help for `cc-bake` by running it with `-h`/`--help`. The main op
 You are required to specify a recipe using `-r` or `-f`. All other options are, well, optional.
 
 Currently, the recipe **must** be specified in JSON. "Chef format" is not supported (but see *Ideas for Improvement* below).
+
+If your recipe spans multiple lines, then any lines that start with a `#` character (optionally preceded by whitespace) are considered comments and ignored.
+
+### As a script
+
+Starting with version 0.0.2 of `cc-bake`, you can now create a shell-style script with your favourite recipes to save them and run them. Here's an example of what that would look like. Save this text as a file called `morse.ccb` and make it executable:
+
+    #!/usr/bin/env -S cc-bake -f
+    [
+        {
+            "args" : {
+                "wordDelimiter" : "Colon"
+            },
+            "op" : "from morse code"
+        }
+    ]
+
+Then you can run it like so:
+
+    echo "... ---:.-.. --- -. --. --..--:.- -. -..:- .... .- -. -.- ...:..-. --- .-.:.- .-.. .-..:- .... .:..-. .. ... .... " \
+    | ./morse.ccb
+
 
 ## Behind the Scenes
 
@@ -67,7 +89,6 @@ I've done my development using [virtual environments][VENV]. Here are the quick 
 
 * Accept recipes in "Chef Format" (blocked by [this pull request][CC-PR1042] against CyberChef, though one could possibly transform to JSON in `cc-bake`)
 * Add an option to list all options supported by the server (blocked by [this pull request][CCS-PR22] against CyberChef-server)
-* Allow recipe files to be "run" directly if they start with something like `#!/usr/bin/env cc-bake -f`
 * Parallel requests, perhaps? Depends on how well CyberChef-server handles parallel requests
 
 ---

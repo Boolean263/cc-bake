@@ -4,11 +4,12 @@
 import json
 import base64
 import copy
+import re
 from collections import namedtuple as _namedtuple
 
 import requests
 
-VERSION = (0, 0, 1)
+VERSION = (0, 0, 2)
 __version__ = '.'.join(map(str, VERSION))
 
 
@@ -83,6 +84,17 @@ class Recipe(list):
     """
 
     def __init__(self, recipe):
+        # If there are multiple lines, remove lines starting with '#'.
+        # This allows the use of comments and shebangs.
+        if "\n" in recipe:
+            orig = recipe
+            recipe = []
+            comment_re = re.compile(r"^\s*#")
+            for line in orig.split("\n"):
+                if not comment_re.match(line):
+                    recipe.append(line)
+            recipe = "\n".join(recipe)
+
         try:
             # Start assuming a JSON string
             item = json.loads(recipe)
