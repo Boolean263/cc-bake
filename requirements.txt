@@ -10,7 +10,7 @@ pluggy==0.13.1
 py==1.10.0
 pyparsing==2.4.7
 pytest==5.4.3
-requests==2.23.0
+requests==2.31.0
 six==1.15.0
 urllib3
 wcwidth==0.2.5
